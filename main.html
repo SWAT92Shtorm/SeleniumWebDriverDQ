@@ -187,6 +187,10 @@
     Стоимость к оплате: не выбран зал.
   </div>
 
+  <button onclick="clearHallPlayers()" style="background:#b22222;margin-top:10px;">
+  Очистить список зала
+  </button>
+
   <script>
     const MAX_PLAYERS = 18;
 
@@ -195,6 +199,23 @@
       "hall1": 4500,
       "hall2": 350
     };
+
+    function clearHallPlayers() {
+      const hall = document.getElementById('hallSelect').value;
+      if (!hall) {
+        alert('Сначала выбери зал.');
+        return;
+      }
+
+      const hallName = hall === 'hall1' ? 'ЛОКОМОТИВ' : 'АТЛАНТ';
+      if (!confirm(`Очистить весь список зала ${hallName}?`)) return;
+
+      playersByHall[hall] = [];
+      localStorage.setItem('basketballPlayersByHall', JSON.stringify(playersByHall));
+
+      showList();
+    }
+
 
     // Список участников и ФИО
     let playersByHall = {};
@@ -253,14 +274,14 @@
         const list = players.map((name, i) => {
           const idx = i + 1;
           const isLimited = idx <= MAX_PLAYERS;
-          const colorStyle = isLimited ? '' : 'color: gray;';
+          const colorStyle = isLimited ? '' : 'color: red;';
+          const nameStyle = isLimited ? '' : 'color: red;';
           return `
-            <div class="playerLine" id="playerLine${i}" style="${colorStyle}">
-              <div class="playerName">
-                <span>${idx}. ${name}</span>
-                <input type="text" id="nameEdit${i}" value="${name}" 
-                       style="display: none; width: 250px; padding: 2px;" />
-              </div>
+            <div class="playerLine" id="playerLine${i}" style="${nameStyle}">
+            <div class="playerName">
+              <span style="${nameStyle}">${idx}. ${name}</span>
+              <input type="text" id="nameEdit${i}" value="${name}" style="display: none; width: 250px; padding: 2px;" />
+            </div>
               <div class="icons">
                 <span onclick="startEdit(${i})" style="cursor: pointer; margin-right: 6px;">✎</span>
                 <span onclick="submitEdit(${i})" style="display: none; cursor: pointer; margin-right: 6px; color: green;">✔</span>

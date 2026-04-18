@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Запись на баскетбол в Ярославле</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }
+    input, button { padding: 10px; margin: 5px 0; font-size: 16px; width: 100%; }
+    .players { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Запись на баскетбол в Ярославле</h1>
+
+  <label>Введи ФИО:</label><br />
+  <input type="text" id="playerName" placeholder="Иван Иванов" />
+
+  <button onclick="addPlayer()">Записаться</button>
+
+  <div id="result"></div>
+
+  <script>
+    // Список участников (для демонстрации, в реальности лучше хранить на сервере)
+    let players = JSON.parse(localStorage.getItem('basketballPlayers')) || [];
+
+    // Показать список при открытии
+    function showList() {
+      const result = document.getElementById('result');
+      result.innerHTML = '<h2>Все записавшиеся:</h2>';
+
+      if (players.length === 0) {
+        result.innerHTML += '<p>Список пока пуст.</p>';
+      } else {
+        const list = players.map((name, i) => `<p>${i + 1}. ${name}</p>`).join('');
+        result.innerHTML += list;
+      }
+    }
+
+    // Добавить игрока
+    function addPlayer() {
+      const input = document.getElementById('playerName');
+      const name = input.value.trim();
+
+      if (!name) {
+        alert('Введите ФИО');
+        return;
+      }
+
+      players.push(name);
+      localStorage.setItem('basketballPlayers', JSON.stringify(players));
+      input.value = '';
+      showList();
+    }
+
+    // Показать список при загрузке страницы
+    showList();
+  </script>
+
+</body>
+</html>

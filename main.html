@@ -398,6 +398,7 @@
       const input = document.getElementById('playerName');
       const error = document.getElementById('playerNameError');
       const name = input.value.trim();
+      const addedAt = new Date().toLocaleString('ru-RU');
       const words = name.split(/\s+/).filter(word => word.length > 0);
 
       if (!name || words.length < 3) {
@@ -422,6 +423,7 @@
       }
 
       playersByHall[hall].push(name);
+
       localStorage.setItem('basketballPlayersByHall', JSON.stringify(playersByHall));
       input.value = '';
       input.style.borderColor = '#ccc';

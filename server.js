@@ -139,6 +139,47 @@ app.patch('/api/players/:hallId/:playerIndex', (req, res) => {
   });
 });
 
+// DELETE /api/players/:hallId/:playerIndex — удалить игрока
+app.delete('/api/players/:hallId/:playerIndex', (req, res) => {
+  const { hallId, playerIndex } = req.params;
+
+  if (!hallId || isNaN(playerIndex)) {
+    return res.status(400).json({ error: 'Bad request' });
+  }
+
+  const index = parseInt(playerIndex, 10);
+
+  fs.readFile(DATA_FILE, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Ошибка чтения players.json:', err.message);
+      return res.status(500).json({ error: 'Failed to read players.json' });
+    }
+
+    try {
+      const { playersByHall, historyByDate } = JSON.parse(data);
+
+      if (!playersByHall[hallId]) {
+        return res.status(400).json({ error: `Нет зала: ${hallId}` });
+      }
+
+      if (index < 0 || index >= playersByHall[hallId].length) {
+        return res.status(400).json({ error: 'Неверный индекс игрока' });
+      }
+
+      playersByHall[hallId].splice(index, 1);
+
+      const updatedData = JSON.stringify({ playersByHall, historyByDate }, null, 2);
+      fs.writeFileSync(DATA_FILE, updatedData);
+
+      res.json({ playersByHall });
+    } catch (parseErr) {
+      console.error('Ошибка парсинга/записи players.json:', parseErr.message);
+      res.status(500).json({ error: 'Failed to update players.json' });
+    }
+  });
+});
+
+
 
 // Порт
 const PORT = process.env.PORT || 8080;

@@ -4,38 +4,41 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 
-console.log('1. Импорт модулей завершён');
+// Выводим, что сервер стартует
+console.log('✈️ Server starting...');
 
+// Создаём Express‑приложение
 const app = express();
-console.log('2. app создан');
 
+// Включаем CORS
 app.use(cors({
   origin: [
     'https://swat92shtorm.github.io',
     'https://seleniumwebdriverdq-production.up.railway.app'
-  ]
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
 }));
-console.log('3. CORS включён');
 
+// Читаем JSON из тела запроса
 app.use(express.json());
-console.log('4. express.json() включён');
 
-// Путь к файлу с данными
+// ------------ Путь к файлу players.json ------------
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DATA_FILE = path.join(DATA_DIR, 'players.json');
 
-console.log('5. DATA_DIR:', DATA_DIR);
-console.log('6. DATA_FILE:', DATA_FILE);
+console.log('📁 DATA_DIR:', DATA_DIR);
+console.log('📄 DATA_FILE:', DATA_FILE);
 
-// Создать папку data, если её нет
+// Создаём папку data, если её нет
 if (!fs.existsSync(DATA_DIR)) {
-  console.log('7. Создаю папку data...');
+  console.log('📁 Создаём папку data...');
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Создать players.json, если его нет
+// Создаём players.json, если его нет
 if (!fs.existsSync(DATA_FILE)) {
-  console.log('8. Создаю players.json...');
+  console.log('📄 Создаём players.json (пустой JSON)');
   const emptyData = {
     playersByHall: { hall1: [], hall2: [] },
     historyByDate: {}
@@ -43,14 +46,14 @@ if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(emptyData, null, 2), 'utf8');
 }
 
-// Загрузка текущих данных (GET /api/players)
+// ------------ Загрузка данных (GET /api/players) ------------
 app.get('/api/players', (req, res) => {
-  console.log('=== GET /api/players ===');
-  console.log('DATA_FILE:', DATA_FILE);
+  console.log('🟢 GET /api/players запрос получен');
+  console.log('  Файл:', DATA_FILE);
 
   try {
     if (!fs.existsSync(DATA_FILE)) {
-      console.log('Файл не существует, создаю пустой...');
+      console.log('  Файл players.json не найден, создаём пустой...');
       const emptyData = {
         playersByHall: { hall1: [], hall2: [] },
         historyByDate: {}
@@ -59,21 +62,47 @@ app.get('/api/players', (req, res) => {
     }
 
     const data = fs.readFileSync(DATA_FILE, 'utf8');
-    console.log('Содержимое файла:', data);
+    console.log('  Содержимое файла:', data);
 
-    const json = JSON.parse(data);
+    // Если файл пустой или битый — отдадим безопасный JSON
+    if (!data.trim()) {
+      console.log('  Файл пустой → возвращаем пустой JSON');
+      return res.json({
+        playersByHall: { hall1: [], hall2: [] },
+        historyByDate: {}
+      });
+    }
+
+    let json;
+
+    try {
+      json = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('❌ Ошибка парсинга JSON:', parseErr.message);
+      console.log('  Возвращаем пустой объект JSON');
+      json = {
+        playersByHall: { hall1: [], hall2: [] },
+        historyByDate: {}
+      };
+      // Пере­запишем файл, чтобы починить его
+      fs.writeFileSync(DATA_FILE, JSON.stringify(json, null, 2), 'utf8');
+    }
+
     res.json(json);
 
   } catch (err) {
-    console.error('Ошибка при чтении/парсинге:', err.message);
-    res.status(500).json({ error: 'Failed to read players.json' });
+    console.error('🔴 Ошибка при чтении/парсинге players.json:', err.message);
+    res.status(500).json({
+      error: 'Failed to read players.json',
+      message: err.message
+    });
   }
 });
 
-// Сохранение игроков и истории (POST /api/savePlayers)
+// ------------ Сохранение (POST /api/savePlayers) ------------
 app.post('/api/savePlayers', (req, res) => {
-  console.log('=== POST /api/savePlayers ===');
-  console.log('BODY ПРИШЁЛ:', req.body);
+  console.log('🟢 POST /api/savePlayers запрос получен');
+  console.log('  Тело запроса:', req.body);
 
   const { playersByHall, historyByDate } = req.body;
 
@@ -84,17 +113,25 @@ app.post('/api/savePlayers', (req, res) => {
 
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-    res.json({ success: true, message: 'Players saved' });
+    console.log('  ✅ players.json сохранён');
+    res.json({
+      success: true,
+      message: 'Players saved successfully'
+    });
+
   } catch (err) {
-    console.error('Ошибка при записи файла:', err.message);
-    res.status(500).json({ error: 'Failed to save players.json' });
+    console.error('🔴 Ошибка записи players.json:', err.message);
+    res.status(500).json({
+      error: 'Failed to save players.json',
+      message: err.message
+    });
   }
 });
 
-// Порт и запуск
+// ------------ Порт и запуск сервера ------------
 const PORT = process.env.PORT || 3000;
-console.log('9. Порт:', PORT);
+console.log('🚀 Порт:', PORT);
 
 app.listen(PORT, () => {
-  console.log(`10. Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });

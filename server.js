@@ -4,10 +4,8 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 
-// === СОЗДАЁМ app ДО ВСЕХ app.use() ===
 const app = express();
 
-// Включаем CORS
 app.use(cors({
   origin: [
     'https://swat92shtorm.github.io',
@@ -15,7 +13,6 @@ app.use(cors({
   ]
 }));
 
-// Важно: разрешить читать JSON из тела запроса
 app.use(express.json());
 
 // Путь к файлу с данными
@@ -66,8 +63,4 @@ app.post('/api/savePlayers', (req, res) => {
   }
 });
 
-// Важно для Railway: использовать PORT из переменной среды
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3

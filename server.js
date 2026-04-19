@@ -213,6 +213,39 @@ app.post('/api/games/confirm', (req, res) => {
   });
 });
 
+// DELETE /api/players/all/:hallId — очистить ВСЕХ участников в зале
+app.delete('/api/players/all/:hallId', (req, res) => {
+  const { hallId } = req.params;
+
+  if (!hallId) {
+    return res.status(400).json({ error: 'Bad request' });
+  }
+
+  fs.readFile(DATA_FILE, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Ошибка чтения players.json:', err.message);
+      return res.status(500).json({ error: 'Failed to read players.json' });
+    }
+
+    try {
+      const { playersByHall, historyByDate } = JSON.parse(data);
+
+      if (!playersByHall[hallId]) {
+        playersByHall[hallId] = [];
+      }
+
+      playersByHall[hallId] = []; // очищаем всех
+
+      const updatedData = JSON.stringify({ playersByHall, historyByDate }, null, 2);
+      fs.writeFileSync(DATA_FILE, updatedData);
+
+      res.json({ playersByHall });
+    } catch (parseErr) {
+      console.error('Ошибка парсинга/записи players.json:', parseErr.message);
+      res.status(500).json({ error: 'Failed to update players.json' });
+    }
+  });
+});
 
 
 // Порт

@@ -261,30 +261,34 @@
 
     // ========== Загрузка данных из JSON-файла ==========
 
-    async function loadFromAPI() {
+ async function loadFromAPI() {
   try {
     const response = await fetch('https://seleniumwebdriverdq-production.up.railway.app/api/players');
-    if (!response.ok) {
-      throw new Error('Не удалось загрузить участников');
-    }
+    if (!response.ok) throw new Error('Не удалось загрузить участников');
     const data = await response.json();
 
-    // из сервера вернётся JSON типа:
-    // {
-    //   playersByHall: { hall1: [...], hall2: [...] },
-    //   historyByDate: { ... }
-    // }
     playersByHall = data.playersByHall || { hall1: [], hall2: [] };
     historyByDate = data.historyByDate || {};
+
+    // === собрать всеИмена из серверного JSON в playerNames
+    const allNames = new Set();
+    Object.values(playersByHall).forEach(hallPlayers => {
+      hallPlayers.forEach(name => {
+        if (name) allNames.add(name);
+      });
+    });
+    playerNames = Array.from(allNames);
+
   } catch (err) {
     console.error('Ошибка при запросе API:', err);
-    // на всякий случай создаём пустые структуры
     playersByHall = { hall1: [], hall2: [] };
     historyByDate = {};
+    playerNames = [];
   }
 
   // после загрузки обновляем отображение списка
   showList();
+  updatePlayersList();   // ✅ вот сюда
 }
 
 

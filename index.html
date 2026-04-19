@@ -342,28 +342,30 @@
       const hallKey = hall;
       const price = hallPrice[hallKey] || 0;
 
-        if (price > 500 && players.length > 0) {
+      if (price > 500 && players.length > 0) {
         const activeCount = Math.min(MAX_PLAYERS, players.length);
         const perPerson = (price / activeCount).toFixed(2);
+        const isUnder10 = players.length < 10;
+        const mainBg = isUnder10 ? '#501010' : '#1a4b1a';   // фон #pricingRow
+        const borderCol = isUnder10 ? '#a03030' : '#006633'; // рамка #pricingRow
+        const phoneBg = isUnder10 ? '#501010' : '#224422';   // фон блока с телефоном
+
+        const priceElem = document.getElementById('pricingRow');
+        priceElem.style.background = mainBg;
+        priceElem.style.borderColor = borderCol;
+
         priceElem.innerHTML = `
-          <div style="margin-bottom: 6px;">
-            <div style="font-weight: bold; color: #ffffff;">
-              Стоимость зала: ${price} ₽
-            </div>
-            <div style="font-size: 13px; margin-top: 2px; color: #e0ffe0;">
-              Оплачивать будут ${activeCount} человек (${activeCount} в пределах лимита)
-            </div>
-            <div style="font-size: 13px; margin-top: 4px;">
-              <strong>Каждому нужно заплатить: ${perPerson} ₽</strong>
-            </div>
+          <div style="font-size: 13px; margin-bottom: 4px;">
+            Стоимость зала: ${price} ₽
+          </div>
+          <div style="font-size: 13px;">
+            Оплачивать будут ${activeCount} человек (${activeCount} в пределах лимита)
+          </div>
+          <div style="font-size: 13px; margin-top: 4px;">
+            <strong>Каждому нужно заплатить: ${perPerson} ₽</strong>
           </div>
 
-          <div style="
-            margin-top: 10px;
-            padding: 8px 10px;
-            background: #224422;
-            border-radius: 4px;
-            border: 1px solid #336633;">
+          <div style="margin-top: 10px; padding: 8px 10px; background: ${phoneBg}; border-radius: 4px; border: 1px solid #336633;">
             <div style="font-size: 13px; color: #e0ffe0; display: flex; align-items: center;">
               Для оплаты переведите деньги на телефон:
               <span style="color: #ffffff; font-weight: bold; margin: 0 8px;" id="displayPhone">${hallPhone[hall]}</span>
@@ -386,12 +388,14 @@
           </div>
         `;
       } else {
+        const priceElem = document.getElementById('pricingRow');
+        priceElem.style.background = '#1a4b1a';
+        priceElem.style.borderColor = '#404040';
         priceElem.innerHTML = `
           Стоимость зала: ${price} ₽.<br>
           Для этого зала не производится деление на участников или участников нет.
         `;
       }
-
 
 
       // Обновляем список автодополнения

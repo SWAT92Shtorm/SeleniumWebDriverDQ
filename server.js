@@ -217,43 +217,36 @@ app.post('/api/games/confirm', (req, res) => {
 app.delete('/api/players/all/:hallId', (req, res) => {
   const { hallId } = req.params;
 
-  // Лог: убедись, что hallId = 'hall1'/'hall2' в DevTools / серверных логах
-  console.log('DELETE /api/players/all/:hallId, hallId:', hallId);
+  console.log('--- DELETE /api/players/all/:hallId ---');
+  console.log('req.params:', req.params);
+  console.log('hallId:', hallId);
+  console.log('typeof hallId:', typeof hallId);
 
   // Проверка: hallId должен быть только hall1 или hall2
   if (!hallId || !['hall1', 'hall2'].includes(hallId)) {
-    return res
-      .status(400)
-      .json({ error: 'Bad request: invalid hallId, allowed: hall1, hall2' });
+    console.log('ERROR: invalid hallId -> 400');
+    return res.status(400).json({ error: 'Bad request: invalid hallId, allowed: hall1, hall2' });
   }
 
   fs.readFile(DATA_FILE, 'utf8', (err, data) => {
     if (err) {
       console.error('Ошибка чтения players.json:', err.message);
+      console.error('Stack:', err.stack);
       return res.status(500).json({ error: 'Failed to read players.json' });
     }
 
     try {
       const { playersByHall, historyByDate } = JSON.parse(data);
 
-      // Убедимся, что playersByHall[hallId] существует
       if (!playersByHall[hallId]) {
         playersByHall[hallId] = [];
       }
 
-      // Очищаем ВСЕХ участников в этом зале
       playersByHall[hallId] = [];
 
-      // Сохраняем обновлённый JSON
-      const updatedData = JSON.stringify(
-        { playersByHall, historyByDate },
-        null,
-        2
-      );
-
+      const updatedData = JSON.stringify({ playersByHall, historyByDate }, null, 2);
       fs.writeFileSync(DATA_FILE, updatedData);
 
-      // Возвращаем обновлённый playersByHall (для фронтенда)
       res.json({ playersByHall });
     } catch (parseErr) {
       console.error('Ошибка парсинга/записи players.json:', parseErr.message);
@@ -261,8 +254,6 @@ app.delete('/api/players/all/:hallId', (req, res) => {
     }
   });
 });
-
-
 
 
 // Порт

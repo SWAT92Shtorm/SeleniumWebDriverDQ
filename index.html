@@ -438,9 +438,9 @@
         return;
       }
 
-      // Отправляем в API
+      // 1. Сохраняем историю игры (как раньше)
       try {
-        const response = await fetch(
+        const historyResponse = await fetch(
           'https://seleniumwebdriverdq-production.up.railway.app/api/games/confirm',
           {
             method: 'POST',
@@ -453,14 +453,31 @@
           }
         );
 
-        if (!response.ok) {
+        if (!historyResponse.ok) {
           throw new Error('Ошибка при подтверждении игры');
         }
 
-        const result = await response.json();
-        historyByDate = result.historyByDate || {};  // обновляем локальный historyByDate
+        const historyResult = await historyResponse.json();
+        historyByDate = historyResult.historyByDate || {};
 
-        // Обновляем таблицу истории под новую версию
+        // 2. Очищаем всех участников в этом зале через новый API
+        const clearResponse = await fetch(
+          `https://seleniumwebdriverdq-production.up.railway.app/api/players/all/${hall}`,
+          {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+
+        if (!clearResponse.ok) {
+          throw new Error('Ошибка при очистке списка участников');
+        }
+
+        const clearResult = await clearResponse.json();
+        playersByHall = clearResult.playersByHall || playersByHall;
+
+        // Обновляем DOM
+        showList();
         showHistoryTable();
 
         const gameText = getNearestGameText(hall).replace('Ближайшая игра: ', '');
@@ -468,11 +485,11 @@
         alert(
           `Игра в зале "${
             hall === 'hall1' ? 'ЛОКОМОТИВ' : 'АТЛАНТ'
-          }" на дату ${dateStr} (${gameText}) подтверждена и сохранена в истории.`
+          }" на дату ${dateStr} (${gameText}) подтверждена, история сохранена и список участников очищен.`
         );
       } catch (err) {
-        console.error('Ошибка при подтверждении игры через API:', err);
-        alert('Не удалось сохранить историю игры через API');
+        console.error('Ошибка при подтверждении игры или очистке списка:', err);
+        alert('Не удалось сохранить историю игры или очистить список участников через API');
       }
     }
 

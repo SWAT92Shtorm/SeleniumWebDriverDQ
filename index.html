@@ -204,6 +204,22 @@
       "hall2": 350
     };
 
+    // Телефоны ответственных
+    const hallPhone = {
+      hall1: "+7 (961) 154-44-11",   // Андрей Дубровин
+      hall2: "+7 (980) 747-20-39"    // Ярослав Волков
+    };
+
+// Копировать телефон в буфер (без alert)
+    async function copyPhoneToClipboard(phone) {
+      try {
+        await navigator.clipboard.writeText(phone);
+        // можно оставить небольшую подсказку в консоли или скрытом тултипе
+      } catch (err) {
+        console.error('Не удалось скопировать телефон:', err);
+      }
+    }
+
     function clearHallPlayers() {
       const hall = document.getElementById('hallSelect').value;
       if (!hall) {
@@ -325,13 +341,48 @@
       const hallKey = hall;
       const price = hallPrice[hallKey] || 0;
 
-      if (price > 500 && players.length > 0) {
+            if (price > 500 && players.length > 0) {
         const activeCount = Math.min(MAX_PLAYERS, players.length);
         const perPerson = (price / activeCount).toFixed(2);
         priceElem.innerHTML = `
-          Стоимость зала: ${price} ₽.<br>
-          Оплачивать будут ${activeCount} человек (${activeCount} в пределах лимита).<br>
-          <strong>Каждому нужно заплатить: ${perPerson} ₽</strong>
+          <div style="margin-bottom: 6px;">
+            <div style="font-weight: bold; color: #ffffff;">
+              Стоимость зала: ${price} ₽
+            </div>
+            <div style="font-size: 13px; margin-top: 2px; color: #e0ffe0;">
+              Оплачивать будут ${activeCount} человек (${activeCount} в пределах лимита)
+            </div>
+            <div style="font-size: 13px; margin-top: 4px;">
+              <strong>Каждому нужно заплатить: ${perPerson} ₽</strong>
+            </div>
+          </div>
+
+          <div style="
+            margin-top: 10px;
+            padding: 8px 10px;
+            background: #224422;
+            border-radius: 4px;
+            border: 1px solid #336633;">
+            <div style="font-size: 13px; color: #e0ffe0; display: flex; align-items: center;">
+              Для оплаты переведите деньги на телефон:
+              <span style="color: #ffffff; font-weight: bold; margin: 0 8px;" id="displayPhone">${hallPhone[hall]}</span>
+              <button
+                onclick="copyPhoneToClipboard('${hallPhone[hall]}')"
+                style="
+                  margin-left: 4px;
+                  padding: 0;
+                  width: 20px;
+                  height: 20px;
+                  border: none;
+                  background: transparent;
+                  color: #a0e0ff;
+                  font-size: 15px;
+                  cursor: pointer;"
+                title="Копировать телефон">
+                📋
+              </button>
+            </div>
+          </div>
         `;
       } else {
         priceElem.innerHTML = `
@@ -339,6 +390,8 @@
           Для этого зала не производится деление на участников или участников нет.
         `;
       }
+
+
 
       // Обновляем список автодополнения
       updatePlayersList();

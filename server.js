@@ -91,5 +91,7 @@ app.post('/api/savePlayers', (req, res) => {
   }
 });
 
-// Порт и запуск
-const PORT = process
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -421,7 +421,7 @@
       const select = document.getElementById('hallSelect');
       const hall = select ? select.value : '';
 
-      console.log('hall:', hall); // ← удобно смотреть в DevTools
+      console.log('hall:', hall);
 
       if (!hall || !['hall1', 'hall2'].includes(hall)) {
         alert('Сначала выберите корректный зал (ЛОКОМОТИВ / АТЛАНТ).');
@@ -464,23 +464,26 @@
         const historyResult = await historyResponse.json();
         historyByDate = historyResult.historyByDate || {};
 
-        // 2. Очищаем всех участников в этом зале
-        const clearResponse = await fetch(
-          `https://seleniumwebdriverdq-production.up.railway.app/api/players/all/${hall}`,
-          {
-            method: 'DELETE'
-            // Без headers Content-Type — тело пустое
+        // 2. Очищаем всех участников — через существующий DELETE /api/players/:hallId/:playerIndex
+        const playersInHall = playersByHall[hall] || [];
+        for (let i = playersInHall.length - 1; i >= 0; i--) {
+          const deleteResponse = await fetch(
+            `https://seleniumwebdriverdq-production.up.railway.app/api/players/${hall}/${i}`,
+            {
+              method: 'DELETE'
+            }
+          );
+
+          if (!deleteResponse.ok) {
+            console.warn(
+              `DELETE ${hall}/${i} failed with status:`,
+              deleteResponse.status
+            );
           }
-        );
-
-        console.log('clearResponse status:', clearResponse.status);
-
-        if (!clearResponse.ok) {
-          throw new Error('Ошибка при очистке списка участников');
         }
 
-        const clearResult = await clearResponse.json();
-        playersByHall = clearResult.playersByHall || playersByHall;
+        // После удаления обновляем состояние
+        playersByHall[hall] = [];
 
         // Обновляем DOM
         showList();

@@ -458,17 +458,21 @@
         }
 
         const result = await response.json();
-        historyByDate = result.historyByDate || {};  // обновляем локальный historyByDate
+        historyByDate = result.historyByDate || {};
 
-        // Обновляем таблицу истории под новую версию
-        showHistoryTable();
+        // Очищаем список участников в этом зале
+        playersByHall[hall] = [];
+
+        // Обновляем DOM
+        showList();
+        showHistoryTable();  // если хочешь сразу видеть новую историю
 
         const gameText = getNearestGameText(hall).replace('Ближайшая игра: ', '');
 
         alert(
           `Игра в зале "${
             hall === 'hall1' ? 'ЛОКОМОТИВ' : 'АТЛАНТ'
-          }" на дату ${dateStr} (${gameText}) подтверждена и сохранена в истории.`
+          }" на дату ${dateStr} (${gameText}) подтверждена, история сохранена и список участников очищен.`
         );
       } catch (err) {
         console.error('Ошибка при подтверждении игры через API:', err);

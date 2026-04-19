@@ -217,12 +217,16 @@ app.post('/api/games/confirm', (req, res) => {
 app.delete('/api/players/all/:hallId', (req, res) => {
   const { hallId } = req.params;
 
-  // Проверяем, что hallId не пустой
-  if (!hallId) {
-    return res.status(400).json({ error: 'Bad request: missing hallId' });
+  // Лог: убедись, что hallId = 'hall1'/'hall2' в DevTools / серверных логах
+  console.log('DELETE /api/players/all/:hallId, hallId:', hallId);
+
+  // Проверка: hallId должен быть только hall1 или hall2
+  if (!hallId || !['hall1', 'hall2'].includes(hallId)) {
+    return res
+      .status(400)
+      .json({ error: 'Bad request: invalid hallId, allowed: hall1, hall2' });
   }
 
-  // Читаем players.json
   fs.readFile(DATA_FILE, 'utf8', (err, data) => {
     if (err) {
       console.error('Ошибка чтения players.json:', err.message);
@@ -232,19 +236,24 @@ app.delete('/api/players/all/:hallId', (req, res) => {
     try {
       const { playersByHall, historyByDate } = JSON.parse(data);
 
-      // Если массив для зала не существует — создаём пустой
+      // Убедимся, что playersByHall[hallId] существует
       if (!playersByHall[hallId]) {
         playersByHall[hallId] = [];
       }
 
-      // Очищаем всех участников в этом зале
+      // Очищаем ВСЕХ участников в этом зале
       playersByHall[hallId] = [];
 
-      // Сохраняем обновлённые данные
-      const updatedData = JSON.stringify({ playersByHall, historyByDate }, null, 2);
+      // Сохраняем обновлённый JSON
+      const updatedData = JSON.stringify(
+        { playersByHall, historyByDate },
+        null,
+        2
+      );
+
       fs.writeFileSync(DATA_FILE, updatedData);
 
-      // Возвращаем обновлённый playersByHall
+      // Возвращаем обновлённый playersByHall (для фронтенда)
       res.json({ playersByHall });
     } catch (parseErr) {
       console.error('Ошибка парсинга/записи players.json:', parseErr.message);
@@ -252,6 +261,7 @@ app.delete('/api/players/all/:hallId', (req, res) => {
     }
   });
 });
+
 
 
 

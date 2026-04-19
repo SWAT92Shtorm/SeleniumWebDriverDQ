@@ -229,6 +229,10 @@
       hall2: "+7 (980) 747-20-39"    // Ярослав Волков
     };
 
+    let playersByHall = { hall1: [], hall2: [] };
+    let playerNames = JSON.parse(localStorage.getItem('basketballPlayerNames')) || [];
+    let historyByDate = {};  // <= убираем дублирующее определение чуть ниже
+
 // Копировать телефон в буфер (без alert)
     async function copyPhoneToClipboard(phone) {
       try {
@@ -280,19 +284,6 @@
     }
 
 
-
-    function loadPlayers() {
-      const saved = localStorage.getItem('basketballPlayersByHall');
-      if (saved) {
-        playersByHall = JSON.parse(saved);
-      } else {
-        playersByHall = {
-          hall1: [],
-          hall2: []
-        };
-      }
-    }
-
     // Показать текущие дата и время
     function showCurrentDateTime() {
       const now = new Date();
@@ -311,9 +302,6 @@
       document.getElementById('currentDateTime').textContent =
         'Сегодня: ' + dtText;
     }
-
-    // История записей: дата → зал → список участников
-    let historyByDate = JSON.parse(localStorage.getItem('basketballHistoryByDate')) || {};
 
     function saveHistory() {
       localStorage.setItem('basketballHistoryByDate', JSON.stringify(historyByDate));
@@ -771,7 +759,6 @@
       });
     }
 
-    loadPlayers();
     showCurrentDateTime();
     setInterval(showCurrentDateTime, 1000);
     showList();
@@ -962,11 +949,7 @@
     }
 
     document.getElementById('hallSelect').addEventListener('change', showNearestGame);
-    
-    //window.addEventListener("DOMContentLoaded", function () {
-    //  showNearestGame();
-    //  showSchedule();
-    // });
+  
   
     window.addEventListener("DOMContentLoaded", async function () {
       await loadFromJSON();          // сначала загружаем JSON
@@ -1005,12 +988,13 @@
       }
     }
 
-    window.addEventListener("DOMContentLoaded", function () {
-      selectNearestHall();       // ✅ выбираем ближайший зал по умолчанию
-      showNearestGame();
-      showSchedule();
-      showList();
-    });
+window.addEventListener("DOMContentLoaded", async function () {
+  await loadFromJSON();
+  selectNearestHall();
+  showNearestGame();
+  showSchedule();
+  showList();
+});
     
   </script>
 

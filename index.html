@@ -180,15 +180,15 @@
 
   <div id="result"></div>
 
+    <!-- Строка расчёта суммы -->
+  <div id="pricingRow">
+    Стоимость к оплате: не выбран зал.
+  </div>
+
   <!-- График игр (скрытый по умолчанию) -->
   <div id="scheduleContainer" style="margin-top: 20px; display: none;">
     <h2>График игр в выбранном зале</h2>
     <div id="scheduleContent"></div>
-  </div>
-
-  <!-- Строка расчёта суммы -->
-  <div id="pricingRow">
-    Стоимость к оплате: не выбран зал.
   </div>
 
   <button onclick="clearHallPlayers()" style="background:#b22222;margin-top:10px;">
@@ -297,6 +297,29 @@
         }).join('');
         result.innerHTML += list;
       }
+
+      // Индикатор заполненности
+      const activeCount = Math.min(MAX_PLAYERS, players.length);
+      const perc = Math.min(100, (players.length / MAX_PLAYERS) * 100);
+      const color = players.length <= MAX_PLAYERS ? '#2e7d32' : '#c62828'; // зелёный / красный
+
+      result.innerHTML += `
+        <div style="margin-top: 12px; font-size: 13px; color: #b0b0b0;">
+          Заполненность:
+          <span style="color: #ffffff;">
+            ${players.length} / ${MAX_PLAYERS} человек
+          </span>
+          <div style="margin-top: 4px; height: 8px; background: #444; border-radius: 4px; overflow: hidden;">
+            <div style="
+              height: 100%;
+              width: ${perc}%;
+              background: ${color};
+              border-radius: 4px;
+              transition: width 0.3s ease;">
+            </div>
+          </div>
+        </div>
+      `;
 
       // Подсчёт и отображение суммы к оплате на человека
       const hallKey = hall;

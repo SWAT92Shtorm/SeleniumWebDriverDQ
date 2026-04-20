@@ -228,6 +228,18 @@
       "hall2": 350
     };
 
+    // Тарифы по времени аренды
+    const hallPriceByDuration = {
+      hall1: {
+        full:  4500,   // 2 часа
+        short: 3375    // 1.5 часа
+      },
+      hall2: {
+        full:  0,   // 2 часа
+        short: 0    // 1.5 часа = 3500 / 2 * 1.5
+      }
+    };
+
     // Телефоны ответственных
     const hallPhone = {
       hall1: "+7 (961) 154-44-11",   // Андрей Дубровин
@@ -591,7 +603,11 @@
 
       // Подсчёт и отображение суммы к оплате на человека
       const hallKey = hall;
-      const price = hallPrice[hallKey] || 0;
+      //const price = hallPrice[hallKey] || 0;
+
+      const durationSelect = document.getElementById('durationSelect');
+      const durationKey = durationSelect ? durationSelect.value : 'full';   // по умолчанию 2 часа
+      const price = hallPriceByDuration[hall]?.[durationKey] || hallPrice[hall] || 0;
 
       if (price > 500 && players.length > 0) {
         const activeCount = Math.min(MAX_PLAYERS, players.length);

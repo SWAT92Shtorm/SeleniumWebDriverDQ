@@ -95,26 +95,26 @@
     border: 1px solid #404040;
   }
 
-#hallSelectRow {
+/* Общий стиль для всех строк "подпись + инпут/селект" */
+.form-row {
   display: flex;
-  align-items: center;   /* ОСНОВНОЙ ключ — выравнивание по вертикали */
+  align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin: 8px 0;
+  height: 40px;
   max-width: 600px;
 }
 
-#hallSelectRow label {
+.form-row label {
   margin: 0;
   white-space: nowrap;
   flex-shrink: 0;
   width: auto;
-  height: 40px;
   font-size: 15px;
-  /* Приведём высоту к тому же, что у полей */
-  line-height: 1.4;
 }
 
-#hallSelectRow select {
+.form-row input,
+.form-row select {
   margin: 0;
   padding: 10px 12px;
   border: 1px solid #404040;
@@ -126,7 +126,6 @@
   flex: 1;
   height: 40px;
   line-height: 1.4;
-  display: block;
 }
 
   #pricingRow {
@@ -198,7 +197,8 @@
 
   <h1>Запись на баскетбол в Ярославле</h1>
 
-  <div id="hallSelectRow">
+  <!-- Зал -->
+  <div class="form-row">
     <label>Выбери зал:</label>
     <select id="hallSelect">
       <option value="hall1">ЛОКОМОТИВ</option>
@@ -209,12 +209,12 @@
   <div id="nearestGameInfo">
     Ближайшая игра: не выбран зал
   </div>
-  
-  <br>
 
-  <label>Введи или выбери ФИО:</label><br />
-  <input type="text" id="playerName" placeholder="Иван Иванович Иванов" list="playersList" maxlength="60" pattern="[A-Za-zА-Яа-яЁё\s\-]{3,}" oninput="this.value = this.value.replace(/[^A-Za-zА-Яа-яЁё\s\-]/g, '');"/>
-  <span id="playerNameError" style="color: red; font-size: 12px; display: none;">
+  <div class="form-row">
+    <label for="playerName">Введи или выбери ФИО:</label>
+    <input type="text" id="playerName" placeholder="Иван Иванович Иванов" list="playersList" maxlength="60" pattern="[A-Za-zА-Яа-яЁё\s\-]{3,}" oninput="this.value = this.value.replace(/[^A-Za-zА-Яа-яЁё\s\-]/g, '');"/>
+  </div>
+  <span id="playerNameError" style="color: red; font-size: 12px; display: none; margin-left: 82px; margin-top: 4px;">
     ФИО должно состоять из трёх слов: Фамилия Имя Отчество
   </span>
 
@@ -237,17 +237,14 @@
     Стоимость к оплате: не выбран зал.
   </div>
 
-  <br>
-
-    <div id="durationRow">
+  <!-- Длительность игры -->
+  <div class="form-row">
     <label>Длительность игры:</label>
     <select id="durationSelect">
       <option value="full">2 часа</option>
       <option value="short">1 час 30 мин</option>
     </select>
   </div>
-
-  <br>
 
   <!-- График игр (скрытый по умолчанию) -->
   <div id="scheduleContainer" style="margin-top: 20px; display: none;">

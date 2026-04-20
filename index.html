@@ -260,38 +260,97 @@
     }
 
     // ========== Загрузка данных из JSON-файла ==========
+  <!--
+  async function loadFromAPI() {
+    try {
+      const response = await fetch('https://seleniumwebdriverdq-production.up.railway.app/api/players');
+      if (!response.ok) throw new Error('Не удалось загрузить участников');
+      const data = await response.json();
 
- async function loadFromAPI() {
-  try {
-    const response = await fetch('https://seleniumwebdriverdq-production.up.railway.app/api/players');
-    if (!response.ok) throw new Error('Не удалось загрузить участников');
-    const data = await response.json();
+      playersByHall = data.playersByHall || { hall1: [], hall2: [] };
+      historyByDate = data.historyByDate || {};
 
-    playersByHall = data.playersByHall || { hall1: [], hall2: [] };
-    historyByDate = data.historyByDate || {};
-
-    // === собрать всеИмена из серверного JSON в playerNames
-    const allNames = new Set();
-    Object.values(playersByHall).forEach(hallPlayers => {
-      hallPlayers.forEach(name => {
-        if (name) allNames.add(name);
+      // === собрать всеИмена из серверного JSON в playerNames
+      const allNames = new Set();
+      Object.values(playersByHall).forEach(hallPlayers => {
+        hallPlayers.forEach(name => {
+          if (name) allNames.add(name);
+        });
       });
-    });
-    playerNames = Array.from(allNames);
+      playerNames = Array.from(allNames);
 
-  } catch (err) {
-    console.error('Ошибка при запросе API:', err);
-    playersByHall = { hall1: [], hall2: [] };
-    historyByDate = {};
-    playerNames = [];
+    } catch (err) {
+      console.error('Ошибка при запросе API:', err);
+      playersByHall = { hall1: [], hall2: [] };
+      historyByDate = {};
+      playerNames = [];
+    }
+
+
+    updatePlayersList();   // ✅ обновляем datalist
+    // после загрузки обновляем отображение списка
+    showList();
+    updatePlayersList();   // ✅ вот сюда
+  }
+  -->
+
+  async function loadFromAPI() {
+    try {
+      // 1. Игроки и текущий playersByHall
+      const response = await fetch(
+        'https://seleniumwebdriverdq-production.up.railway.app/api/players'
+      );
+
+      if (!response.ok) throw new Error('Не удалось загрузить участников');
+
+      const data = await response.json();
+
+      playersByHall = data.playersByHall || { hall1: [], hall2: [] };
+
+
+
+      // 2. НОВЫЙ БЛОК: история записей из базы (все игры)
+      const historyResponse = await fetch(
+        'https://seleniumwebdriverdq-production.up.railway.app/api/history'
+      );
+
+      if (!historyResponse.ok) throw new Error('Не удалось загрузить историю');
+
+      const historyData = await historyResponse.json();
+      historyByDate = historyData.historyByDate || {};
+
+
+
+      // 3. Собрать playerNames из базы (игроки + истории)
+      const allNames = new Set();
+      Object.values(playersByHall).forEach(hallPlayers => {
+        hallPlayers.forEach(name => {
+          if (name) allNames.add(name);
+        });
+      });
+
+      Object.keys(historyByDate).forEach(dateStr => {
+        const dateData = historyByDate[dateStr];
+        for (const hallId in dateData) {
+          const players = dateData[hallId] || [];
+          players.forEach(name => {
+            if (name) allNames.add(name.trim());
+          });
+        }
+      });
+
+      playerNames = Array.from(allNames);
+    } catch (err) {
+      console.error('Ошибка при запросе API:', err);
+      playersByHall = { hall1: [], hall2: [] };
+      historyByDate = {};
+      playerNames = [];
+    }
+
+    updatePlayersList();
+    showList();
   }
 
-
-  updatePlayersList();   // ✅ обновляем datalist
-  // после загрузки обновляем отображение списка
-  showList();
-  updatePlayersList();   // ✅ вот сюда
-}
 
 
     // Показать текущие дата и время

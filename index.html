@@ -866,7 +866,11 @@
         }
         
         // Обновить историю и список
+        await loadFromAPI();
+        // обновляет playersByHall, historyByDate и перерисовывает
+
         showList();
+        
       } catch (err) {
         console.error('Ошибка при удалении через API:', err);
         alert('Не удалось удалить игрока через API');

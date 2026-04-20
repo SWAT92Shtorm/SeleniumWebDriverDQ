@@ -98,19 +98,20 @@
 #hallSelectRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 12px;
-  max-width: 600px;   /* чтобы не вылезать за контейнер */
+  max-width: 600px;
 }
 
 #hallSelectRow label {
   margin: 0;
   white-space: nowrap;
   flex-shrink: 0;
-  font-size: 15px;
+  /* Ширина только под текст, не 100% */
+  width: auto;
 }
 
-/* select больше не получает width: 100% от label, input, select */
+/* Отдельно для селекта — как у других полей, но без лишних отступов */
 #hallSelectRow select {
   margin: 0;
   padding: 10px;
@@ -120,7 +121,7 @@
   background-color: #2d2d2d;
   color: #f0f0f0;
   box-sizing: border-box;
-  /* позволяет селекту растягиваться, но не выходить за родитель */
+  /* Занимает всё оставшееся место, но не больше 600px */
   flex: 1;
 }
 

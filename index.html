@@ -191,13 +191,6 @@
     Стоимость к оплате: не выбран зал.
   </div>
 
-  <!-- Блок подтверждения игры (скрывается/показывается по логике >10 человек) -->
-  <div id="confirmGameBlock" style="margin-top: 12px; padding: 8px; border-radius: 4px; background: #252525; border: 1px solid #404040; display: none;">
-    <button onclick="confirmGame()">
-      Игра состоялась
-    </button>
-  </div>
-
   <!-- График игр (скрытый по умолчанию) -->
   <div id="scheduleContainer" style="margin-top: 20px; display: none;">
     <h2>График игр в выбранном зале</h2>
@@ -488,98 +481,6 @@
       historyTableContainer.innerHTML = html;
     }
 
-
-      // Подтвердить игру и сохранить текущий список в историю ближайшей даты
-
-      async function confirmGame() {
-        const select = document.getElementById('hallSelect');
-        const hall = select ? select.value : '';
-
-        console.log('hall:', hall);
-
-        if (!hall || !['hall1', 'hall2'].includes(hall)) {
-          alert('Сначала выберите корректный зал (ЛОКОМОТИВ / АТЛАНТ).');
-          return;
-        }
-
-        const players = playersByHall[hall] || [];
-
-        if (players.length === 0) {
-          alert('Список игроков пуст.');
-          return;
-        }
-
-        const dateStr = getNearestGameDate(hall);
-
-        if (!dateStr) {
-          alert('Не удалось определить ближайшую дату игры.');
-          return;
-        }
-
-        try {
-          // 1. Сохраняем историю игры
-          const historyResponse = await fetch(
-            'https://seleniumwebdriverdq-production.up.railway.app/api/games/confirm',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                hallId: hall,
-                date: dateStr,
-                players: players
-              })
-            }
-          );
-
-          if (!historyResponse.ok) {
-            throw new Error('Ошибка при подтверждении игры');
-          }
-
-          const historyResult = await historyResponse.json();
-          historyByDate = historyResult.historyByDate || {};
-
-          // 2. Очищаем всех участников — сохраняем пустой массив игроков в этом зале
-          const syncResponse = await fetch(
-            `https://seleniumwebdriverdq-production.up.railway.app/api/players/sync/${hall}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                players: [] // пустой массив
-              })
-            }
-          );
-
-          if (!syncResponse.ok) {
-            console.error('Ошибка при синхронизации пустого списка:', await syncResponse.text());
-            throw new Error('Ошибка при очистке списка участников');
-          }
-
-          // после обновления истории — обновить подсказки
-          updatePlayersList();
-
-          const syncResult = await syncResponse.json();
-          playersByHall = syncResult.playersByHall || playersByHall;
-
-          // Обновляем DOM
-          showList();
-          showHistoryTable();
-
-          const gameText = getNearestGameText(hall).replace('Ближайшая игра: ', '');
-
-          alert(
-            `Игра в зале "${
-              hall === 'hall1' ? 'ЛОКОМОТИВ' : 'АТЛАНТ'
-            }" на дату ${dateStr} (${gameText}) подтверждена, история сохранена и список участников очищен.`
-          );
-        } catch (err) {
-          console.error('Ошибка при подтверждении игры или очистке списка:', err);
-          alert('Не удалось сохранить историю игры или очистить список участников через API');
-        }
-      }
-
-
-
     // Показать список участников с inline-редактированием и подсчётом суммы
     function showList() {
       const hall = document.getElementById('hallSelect').value;
@@ -588,17 +489,6 @@
       const players = playersByHall[hall] || [];
 
       const currentPlayers = players.length;
-
-      // === показать/скрыть кнопку при >10 человек ===
-      const confirmBlock = document.getElementById('confirmGameBlock');
-      if (confirmBlock) {
-        if (currentPlayers > 9) {
-          confirmBlock.style.display = 'block';
-        } else {
-          confirmBlock.style.display = 'none';
-        }
-      }
-
 
       // Вывод списка
       if (!hall) {
@@ -835,7 +725,7 @@ async function submitEdit(index) {
     
     // перерисовать список
     showList();
-    
+
   } catch (err) {
     console.error('Ошибка при редактировании через API:', err);
     alert('Не удалось отредактировать игрока через API');

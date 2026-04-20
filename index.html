@@ -315,8 +315,8 @@
       localStorage.setItem('basketballHistoryByDate', JSON.stringify(historyByDate));
     }
 
-        // Показать историю записей в виде таблицы под списком участников
-         function showHistoryTable() {
+    // Показать историю записей в виде таблицы под списком участников
+    function showHistoryTable() {
       const hall = document.getElementById('hallSelect').value;
       const histName = hall === 'hall1' ? 'ЛОКОМОТИВ' : 'АТЛАНТ';
 
@@ -328,6 +328,7 @@
         return;
       }
 
+      // собрать записи только для этого зала: { date: "2026-04-19", players: [...] }
       const entries = [];
 
       Object.keys(historyByDate).forEach(dateStr => {
@@ -346,75 +347,62 @@
 
       historyTableContainer.style.display = 'block';
 
-      // сортируем так, чтобы самая свежая дата была первой
-      // '2026-04-19' > '2026-04-18' → в JavaScript это работает правильно
+      // сортируем по дате: свежие сверху
       entries.sort((a, b) => {
-        if (a.date < b.date) return 1;   // a старше — ниже
-        if (a.date > b.date) return -1;  // a свежее — выше
+        if (a.date < b.date) return 1;
+        if (a.date > b.date) return -1;
         return 0;
       });
 
-      let rows = entries.map(entry => {
+      // формируем блочную «карточку» для каждой даты (как в расписании)
+      let html = `
+        <h3 style="
+          color: #a0e0ff;
+          margin-top: 14px;
+          margin-bottom: 8px;
+          font-size: 16px;">
+          История записей в зале ${histName} по датам
+        </h3>
+
+        <div style="
+          display: flex;
+          flex-direction: column;
+          gap: 10px;">
+      `;
+
+      entries.forEach(entry => {
         const dateStr = entry.date;
         const players = entry.players;
 
-        return `
-          <tr>
-            <td style="
-              white-space: nowrap;
-              padding: 6px;
-              border: 1px solid #404040;
-              color: #e0e0e0;
-              font-size: 12px;">
-              ${dateStr}
-            </td>
-            <td style="
-              padding: 6px;
-              border: 1px solid #404040;
-              color: #e0e0e0;
-              font-size: 12px;">
-              ${players.join(', ')}
-            </td>
-          </tr>
-        `;
-      }).join('');
+        html += `
+          <div style="
+            padding: 10px;
+            border-radius: 4px;
+            background: #222;
+            border: 1px solid #404040;
+            font-size: 13px;
+            color: #e0e0e0;">
 
-      historyTableContainer.innerHTML = `
-        <h3 style="color: #a0e0ff; margin-top: 10px;">История записей в зале ${histName} по датам</h3>
-        <table style="
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 6px;
-          background: #222;
-          table-layout: fixed;">
-          <thead>
-            <tr style="background: #333;">
-              <th style="
-                width: 15%;
-                padding: 6px;
-                border: 1px solid #404040;
-                color: #ffffff;
-                text-align: left;
-                font-size: 13px;">
-                Дата
-              </th>
-              <th style="
-                width: 85%;
-                padding: 6px;
-                border: 1px solid #404040;
-                color: #ffffff;
-                text-align: left;
-                font-size: 13px;">
-                Участники
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      `;
+            <div style="
+              font-weight: 600;
+              color: #a0e0ff;
+              margin-bottom: 4px;">
+              ${dateStr}
+            </div>
+
+            <div style="
+              line-height: 1.5;">
+              ${players.join(', ')}
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+
+      historyTableContainer.innerHTML = html;
     }
+
 
       // Подтвердить игру и сохранить текущий список в историю ближайшей даты
 

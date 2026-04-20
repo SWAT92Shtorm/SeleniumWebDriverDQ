@@ -78,16 +78,22 @@ app.get('/api/players', (req, res) => {
 app.get('/api/players', async (req, res) => {
   try {
     const result = await client.query(
-      `SELECT
-         p.id,
-         p.name,
-         g.hall_id,
-         MIN(g.date) AS first_game_date
-       FROM players p
-       JOIN game_players gp ON p.id = gp.player_id
-       JOIN games g ON gp.game_id = g.id
-       GROUP BY p.id, p.name, g.hall_id
-       ORDER BY first_game_date ASC, p.name;`
+        `SELECT
+            p.id,
+            p.name,
+            g.hall_id,
+            g.date
+        FROM players p
+        JOIN game_players gp ON p.id = gp.player_id
+        JOIN games g ON gp.game_id = g.id
+        WHERE g.hall_id = $1
+            AND g.date = (
+            SELECT MIN(date)
+            FROM games
+            WHERE hall_id = $1
+                AND date >= CURRENT_DATE
+            )
+        ORDER BY g.date ASC, p.name;`
     );
 
     const playersByHall = { hall1: [], hall2: [] };
@@ -243,11 +249,14 @@ app.post('/api/players/:hallId', async (req, res) => {
     // 5. Возвращаем список игроков игры
     console.log('11️⃣ Читаем всех игроков игры');
     const gamePlayers = await client.query(
-      `SELECT p.name
-       FROM game_players gp
-       JOIN players p ON gp.player_id = p.id
-       WHERE gp.game_id = $1;`,
-      [game.id]
+        `SELECT
+            p.name
+        FROM game_players gp
+        JOIN players p ON gp.player_id = p.id
+        JOIN games g ON gp.game_id = g.id
+        WHERE gp.game_id = $1
+        ORDER BY g.date ASC, p.name;`,
+        [game.id]
     );
 
     const players = gamePlayers.rows.map(r => r.name);

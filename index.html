@@ -99,9 +99,22 @@
     margin-bottom: 10px;
   }
 
-  #hallSelectRow > * {
-    display: block;
-    margin: 2px 0;
+  #hallSelectRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  #hallSelectRow label {
+    flex-shrink: 0;
+    margin: 0 8px 0 0;
+    font-size: 14px;
+  }
+
+  #hallSelectRow select {
+    flex: 1;
+    margin: 0;
   }
 
   #pricingRow {

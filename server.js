@@ -4,6 +4,22 @@ const path = require('path');
 
 const app = express();
 
+const { Client } = require('pg');
+
+// Подключение к PostgreSQL в Railway (по DATABASE_URL)
+const client = new Client({
+  connectionString: process.env.DATABASE_URL
+});
+
+// попытаться подключиться при старте
+client.connect()
+  .then(() => {
+    console.log('✅ Подключено к PostgreSQL');
+  })
+  .catch(err => {
+    console.error('❌ Ошибка подключения к PostgreSQL:', err.message);
+  });
+
 // Путь к файлу data/players.json
 const DATA_FILE = path.join(__dirname, 'data/players.json');
 

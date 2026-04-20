@@ -167,6 +167,8 @@
   <div id="nearestGameInfo">
     Ближайшая игра: не выбран зал
   </div>
+  
+  <br>
 
   <div id="durationRow">
     <label>Длительность аренды:</label>
@@ -604,6 +606,7 @@
       const durationSelect = document.getElementById('durationSelect');
       const durationKey = durationSelect ? durationSelect.value : 'full';   // по умолчанию 2 часа
       const price = hallPriceByDuration[hall]?.[durationKey] || hallPrice[hall] || 0;
+      const durationText = durationKey === 'full' ? '2 часа' : durationKey === 'short' ? '1 час 30 мин' : '';
 
       if (price > 500 && players.length > 0) {
         const activeCount = Math.min(MAX_PLAYERS, players.length);
@@ -620,6 +623,9 @@
         priceElem.innerHTML = `
           <div style="font-size: 13px; margin-bottom: 4px;">
             Стоимость зала: ${price} ₽
+          </div>
+          <div style="font-size: 13px;">
+            Время аренды: ${durationText}
           </div>
           <div style="font-size: 13px;">
             Оплачивать будут ${activeCount} человек (${activeCount} в пределах лимита)
@@ -657,7 +663,6 @@
           </div>
         `;
       } else {
-        const priceElem = document.getElementById('pricingRow');
         priceElem.style.background = '#1a4b1a';
         priceElem.style.borderColor = '#404040';
         priceElem.innerHTML = `

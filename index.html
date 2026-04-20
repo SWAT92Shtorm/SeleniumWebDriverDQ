@@ -179,7 +179,7 @@
     </select>
   </div>
 
-   <br> 
+   <br> <br>
 
   <label>Введи или выбери ФИО:</label><br />
   <input type="text" id="playerName" placeholder="Иван Иванович Иванов" list="playersList" />
@@ -495,169 +495,7 @@
     }
 
     // Показать список участников с inline-редактированием и подсчётом суммы
-  function showList() {
-    const hall = document.getElementById('hallSelect').value;
-    const durationSelect = document.getElementById('durationSelect');
-    const durationKey = durationSelect ? durationSelect.value : '';
-    const durationText = durationKey === 'full' ? '2 часа' : durationKey === 'short' ? '1 час 30 мин' : '';
-
-    const result = document.getElementById('result');
-    const priceElem = document.getElementById('pricingRow');
-    const players = playersByHall[hall] || [];
-    const currentPlayers = players.length;
-    const activeCount = Math.min(MAX_PLAYERS, players.length);
-
-    // Вывод списка
-
-    if (!hall) {
-      result.innerHTML = '<p>Выберите зал, чтобы увидеть список участников.</p>';
-      priceElem.textContent = 'Стоимость к оплате: не выбран зал.';
-      return;
-    }
-
-    // Выбранный зал и ответственный
-    const sel = document.getElementById('hallSelect');
-    const hallText = sel.options[sel.selectedIndex].text;
-
-    const parts = hallText.split(' [Отв. ');
-    const hallName = parts[0];
-    const resp = parts[1] ? parts[1].replace(']', '') : '';
-
-    result.innerHTML = `
-      <div style="
-        font-size: 20px;
-        font-weight: 600;
-        color: #ffffff;
-        margin-bottom: 14px;
-        padding-bottom: 6px;
-        border-bottom: 1px solid #404040;">
-        Все записавшиеся в <span style="color: #a0e0ff;">${hallName}</span>
-      </div>
-      ${resp ? `
-        <div style="
-          font-size: 13px;
-          margin-bottom: 14px;
-          color: #b0ffa0;">
-          Ответственный: ${resp}
-        </div>
-      ` : ''}
-    `;
-
-    if (players.length === 0) {
-      result.innerHTML += '<p>Список пока пуст.</p>';
-    } else {
-      const list = players.map((name, i) => {
-        const idx = i + 1;
-        const isLimited = idx <= MAX_PLAYERS;
-        const nameStyle = isLimited ? '' : 'color: red;';
-        return `
-          <div class="playerLine" id="playerLine${i}" style="${nameStyle}">
-            <div class="playerName">
-              <span style="${nameStyle}">${idx}. ${name}</span>
-              <input type="text" id="nameEdit${i}" value="${name}" style="display: none; width: 250px; padding: 2px;" />
-            </div>
-            <div class="icons">
-              <span onclick="startEdit(${i})" style="cursor: pointer; margin-right: 6px;">✎</span>
-              <span onclick="submitEdit(${i})" style="display: none; cursor: pointer; margin-right: 6px; color: green;">✔</span>
-              <span onclick="cancelEdit(${i})" style="display: none; cursor: pointer; margin-right: 6px; color: gray;">✖</span>
-              <span onclick="removePlayer(${i})" style="cursor: pointer; color: red;">🗑️</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-      result.innerHTML += list;
-    }
-
-    // Индикатор заполненности
-    const perc = Math.min(100, (players.length / MAX_PLAYERS) * 100);
-    const barColor = players.length < 10 ? '#c62828' : '#2e7d32';
-
-    result.innerHTML += `
-      <div style="margin-top: 12px; font-size: 13px; color: #b0b0b0;">
-        Заполненность:
-        <span style="color: #ffffff;">
-          ${players.length} / ${MAX_PLAYERS} человек
-        </span>
-        <div style="margin-top: 4px; height: 8px; background: #444; border-radius: 4px; overflow: hidden;">
-          <div style="
-            height: 100%;
-            width: ${perc}%;
-            background: ${barColor};
-            border-radius: 4px;
-            transition: width 0.3s ease;">
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Расчёт суммы
-    const price = hallPrice[hall] || 0;
-
-    if (price > 500 && activeCount > 0) {
-      const perPerson = (price / activeCount).toFixed(2);
-      const isUnder10 = players.length < 10;
-      const mainBg = isUnder10 ? '#501010' : '#1a4b1a';
-      const borderCol = isUnder10 ? '#a03030' : '#006633';
-      const phoneBg = isUnder10 ? '#501010' : '#224422';
-
-      priceElem.style.background = mainBg;
-      priceElem.style.borderColor = borderCol;
-
-      priceElem.innerHTML = `
-        <div style="font-size: 13px; margin-bottom: 4px;">
-          Стоимость зала: ${price} ₽
-        </div>
-        <div style="font-size: 13px;">
-          Время аренды: ${durationText}
-        </div>
-        <div style="font-size: 13px;">
-          Оплачивать будут ${activeCount} человек
-        </div>
-        <div style="font-size: 13px; margin-top: 4px;">
-          <strong>Каждому нужно заплатить: ${perPerson} ₽</strong>
-        </div>
-
-        <div style="
-          margin-top: 10px;
-          padding: 8px 10px;
-          background: ${phoneBg};
-          border-radius: 4px;
-          border: 1px solid #336633;
-          font-size: 13px;
-          color: #e0ffe0;">
-          Для оплаты переведите деньги на телефон:
-          <br />
-          <span style="color: #ffffff; font-weight: bold;" id="displayPhone">${hallPhone[hall]}</span>
-          <button
-            onclick="copyPhoneToClipboard('${hallPhone[hall]}')"
-            style="
-              margin-left: 6px;
-              padding: 0;
-              width: 20px;
-              height: 20px;
-              border: none;
-              background: transparent;
-              color: #a0e0ff;
-              font-size: 15px;
-              cursor: pointer;"
-            title="Копировать телефон">
-            📋
-          </button>
-        </div>
-      `;
-    } else {
-      const text2 = durationText ? `за ${durationText}` : '';
-      priceElem.style.background = '#1a4b1a';
-      priceElem.style.borderColor = '#404040';
-      priceElem.innerHTML = `
-        Стоимость зала: ${price} ₽ ${text2}.<br>
-        Для этого зала не производится деление на участников или участников нет.
-      `;
-    }
-
-    showHistoryTable();
-  }
-
+    function showList() {
       const hall = document.getElementById('hallSelect').value;
       const result = document.getElementById('result');
       const priceElem = document.getElementById('pricingRow');
@@ -1138,10 +976,6 @@ async function submitEdit(index) {
     document.getElementById('hallSelect').addEventListener('change', function () {
       showList();
       showSchedule();
-    });
-
-    document.getElementById('durationSelect').addEventListener('change', function () {
-      showList();
     });
 
     // ===============================

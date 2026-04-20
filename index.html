@@ -315,6 +315,29 @@
       localStorage.setItem('basketballHistoryByDate', JSON.stringify(historyByDate));
     }
 
+    // ФИО из истории
+    function collectAllNamesFromHistory() {
+      const allNames = new Set();
+
+      // из playerNames
+      playerNames.forEach(name => {
+        if (name) allNames.add(name.trim());
+      });
+
+      // из historyByDate[hall1] и historyByDate[hall2]
+      for (const dateStr in historyByDate) {
+        const dateData = historyByDate[dateStr];
+        for (const hallId in dateData) {
+          const players = dateData[hallId] || [];
+          players.forEach(name => {
+            if (name) allNames.add(name.trim());
+          });
+        }
+      }
+
+      return Array.from(allNames);
+    }
+
     // Показать историю записей в виде таблицы под списком участников
     function showHistoryTable() {
       const hall = document.getElementById('hallSelect').value;
@@ -469,6 +492,9 @@
             console.error('Ошибка при синхронизации пустого списка:', await syncResponse.text());
             throw new Error('Ошибка при очистке списка участников');
           }
+
+          // после обновления истории — обновить подсказки
+          updatePlayersList();
 
           const syncResult = await syncResponse.json();
           playersByHall = syncResult.playersByHall || playersByHall;
@@ -858,12 +884,13 @@
       }
     }
 
-
     function updatePlayersList() {
       const list = document.getElementById('playersList');
       list.innerHTML = ''; // очищаем
 
-      playerNames.forEach(name => {
+      const allNames = collectAllNamesFromHistory();
+
+      allNames.forEach(name => {
         const option = document.createElement('option');
         option.value = name;
         list.appendChild(option);

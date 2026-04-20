@@ -828,12 +828,14 @@ async function submitEdit(index) {
       playerNames[idxInNames] = newName;
     }
 
-    // Обновить localStorage
-    localStorage.setItem('basketballPlayerNames', JSON.stringify(playerNames));
-    localStorage.setItem('basketballPlayersByHall', JSON.stringify(playersByHall));
 
+    // Обновить историю и список
+    await loadFromAPI();
+    // обновляет playersByHall, historyByDate и перерисовывает
+    
     // перерисовать список
     showList();
+    
   } catch (err) {
     console.error('Ошибка при редактировании через API:', err);
     alert('Не удалось отредактировать игрока через API');

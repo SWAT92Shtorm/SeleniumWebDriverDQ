@@ -269,18 +269,18 @@ app.post('/api/players/:hallId', async (req, res) => {
   }
 });
 
-// ✅ НОВЫЙ endpoint с датой
+// НОВЫЙ endpoint с датой
 app.get('/api/players/:hallId/:date', async (req, res) => {
   const { hallId, date } = req.params;
   
   try {
     const result = await client.query(`
-      SELECT DISTINCT p.name
+      SELECT DISTINCT p.name, gp.created_at  
       FROM game_players gp
       JOIN players p ON gp.player_id = p.id
       JOIN games g ON gp.game_id = g.id
       WHERE g.hall_id = $1 AND g.date = $2
-      ORDER BY gp.created_at ASC
+      ORDER BY gp.created_at ASC  
     `, [hallId, date]);
     
     const players = result.rows.map(row => row.name);
@@ -289,6 +289,7 @@ app.get('/api/players/:hallId/:date', async (req, res) => {
       playersByHall: { [hallId]: players } 
     });
   } catch (err) {
+    console.error('API players/:hall/:date:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

@@ -1261,29 +1261,26 @@ async function submitEdit(index) {
 }
 
 
-  async function showNearestGame() {
-    const hall = document.getElementById('hallSelect').value;
-    const info = document.getElementById('nearestGameInfo');
+async function showNearestGame() {
+  const hall = document.getElementById('hallSelect').value;
+  const info = document.getElementById('nearestGameInfo');
 
-    if (!hall) {
-      info.textContent = "Ближайшая игра: не выбран зал";
-      return;
-    }
-
-    const newNearestText = getNearestGameText(hall);
-    const newNearestDate = getNearestGameDate(hall);  // твоя функция, возвращает YYYY-MM-DD
-
-    info.textContent = newNearestText;
-
-    // Если дата ближайшей игры изменилась
-    if (newNearestDate !== lastNearestDate) {
-      lastNearestDate = newNearestDate;
-
-      // Перезагружаем список именно для новой даты
-      await loadFromAPI();
-      showList();  // обновляет playersByHall, historyByDate и отрисовку
-    }
+  if (!hall) {
+    info.textContent = "Ближайшая игра: не выбран зал";
+    return;
   }
+
+  const newNearestText = getNearestGameText(hall);
+  const newNearestDate = getNearestGameDate(hall);
+  info.textContent = newNearestText;
+
+  // ПРИ СМЕНЕ ДАТЫ — ПЕРЕЗАГРУЗИТЬ СПИСОК
+  if (newNearestDate !== lastNearestDate) {
+    lastNearestDate = newNearestDate;
+    await loadFromAPI();  // Полная перезагрузка
+    showList();           // Перерисовка под новую дату
+  }
+}
 
 // Подписываемся на изменение зала
 document.getElementById('hallSelect').addEventListener('change', showNearestGame);

@@ -557,13 +557,31 @@
       historyTableContainer.innerHTML = html;
     }
 
-    // Подсчёт записей игрока в зале
+    // Фильтр только прошедших сессий для счётчика
+    function getPastSessions(playerSessions) {
+      const now = new Date();
+      return playerSessions.filter(session => {
+        const sessionDate = new Date(session.date + 'T' + session.time);
+        return sessionDate < now;
+      });
+    }
+
+    // Подсчёт записей игрока в зале (ТОЛЬКО ПРОШЕДШИЕ)
     function countPlayerVisits(historyByDate, playerName, hall) {
       let count = 0;
       for (let dateStr in historyByDate) {
         const dateData = historyByDate[dateStr];
-        if (dateData[hall] && dateData[hall].includes(playerName)) {
-          count++;
+        if (dateData[hall]) {
+          // ФИЛЬТРУЕМ ТОЛЬКО ПРОШЕДШИЕ ДАТЫ
+          const hallSessions = dateData[hall].map(p => ({
+            date: dateStr,
+            time: '21:00', // время по умолчанию из расписания
+            name: p
+          }));
+          const pastSessions = getPastSessions(hallSessions);
+          if (pastSessions.some(session => session.name === playerName)) {
+            count++;
+          }
         }
       }
       return count;

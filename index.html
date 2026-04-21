@@ -499,9 +499,6 @@
         return;
       }
 
-      entries.sort((a, b) => new Date(b.date) - new Date(a.date));
-      entries = entries.slice(0, 2);
-
       historyTableContainer.style.display = 'block';
 
       entries.sort((a, b) => {

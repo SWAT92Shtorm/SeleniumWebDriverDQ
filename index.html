@@ -188,6 +188,50 @@
   100% { transform: translateY(-10px) rotate(0deg); }
 }
 
+@media (max-width: 480px) {
+  body { 
+    margin: 10px; 
+    font-size: 14px; 
+  }
+  
+  .form-row { 
+    flex-direction: column !important; 
+    align-items: stretch !important; 
+    gap: 6px; 
+    height: auto !important; 
+  }
+  
+  .form-row label { 
+    width: 100%; 
+    font-size: 14px; 
+    padding: 4px 0; 
+  }
+  
+  .playerLine { 
+    flex-direction: column !important; 
+    gap: 4px; 
+  }
+  
+  input[type="text"], input[type="number"], input[type="time"] { 
+    font-size: 16px;  /* iOS zoom fix */
+    padding: 10px; 
+    height: 44px;     /* Touch-friendly */
+  }
+  
+  button { 
+    height: 44px; 
+    font-size: 16px; 
+    padding: 0 20px; 
+  }
+  
+  #playersContainer { 
+    max-height: 300px; 
+    overflow-y: auto; 
+  }
+  
+  h1 { font-size: 20px; }
+  #totalTime { font-size: 16px; }
+}
 
 </style>
 

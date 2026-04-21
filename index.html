@@ -499,14 +499,11 @@
         return;
       }
 
+      entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+      entries = entries.slice(0, 2);
+
       historyTableContainer.style.display = 'block';
 
-      // сортируем по дате: свежие сверху
-      entries.sort((a, b) => {
-        if (a.date < b.date) return 1;
-        if (a.date > b.date) return -1;
-        return 0;
-      });
 
       // формируем блочную «карточку» для каждой даты (как в расписании)
       let html = `

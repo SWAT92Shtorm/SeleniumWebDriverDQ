@@ -1213,9 +1213,9 @@ async function submitEdit(index) {
 
   const nearestDate = new Date(now);
   nearestDate.setDate(now.getDate() + nearest.dayDiff);
-  nearestDate.setHours(0, 0, 0, 0);
+  nearestDate.setHours(21, 0, 0, 0);  // жёстко 21:00
 
-  console.log('❗ getNearestGameDate(hall):', hall, '→', nearestDate.toISOString().split('T')[0]);
+  console.log('getNearestGameDate(hall):', hall, '→', nearestDate.toISOString().split('T')[0]);
   return nearestDate.toISOString().split('T')[0];
 }
 

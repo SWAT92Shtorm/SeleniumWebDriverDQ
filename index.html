@@ -1191,44 +1191,31 @@ async function submitEdit(index) {
     }
 
     function getNearestGameDate(hall) {
-      const now = new Date();
-      const nowWeekDay = now.getDay() || 7;
-      const nowHour = now.getHours();
+  const now = new Date();
+  const nowWeekDay = now.getDay() || 7;
 
-      let nearest = null;
+  let nearest = null;
 
-      scheduleDefs
-        .filter(item => item.hall === hall)
-        .forEach(item => {
-          const dayCode = getDayCode(item.day);
-          const dayDiff = (dayCode - nowWeekDay + 7) % 7;
-          const approximateHour = item.from;
-          let timeDiff = dayDiff * 24 + (approximateHour - nowHour);
+  scheduleDefs
+    .filter(item => item.hall === hall)
+    .forEach(item => {
+      const dayCode = getDayCode(item.day);
+      const dayDiff = (dayCode - nowWeekDay + 7) % 7;
 
-          if (timeDiff < 0) {
-            timeDiff += 7 * 24;
-          }
+      if (!nearest || dayDiff < (nearest?.dayDiff ?? 999)) {
+        nearest = { dayDiff, from: item.from, to: item.to };
+      }
+    });
 
-          if (!nearest || timeDiff < nearest.diff) {
-            nearest = {
-              diff: timeDiff,
-              from: item.from,
-              to: item.to
-            };
-          }
-        });
+  if (!nearest) return null;
 
-      if (!nearest) return null;
+  const nearestDate = new Date(now);
+  nearestDate.setDate(now.getDate() + nearest.dayDiff);
+  nearestDate.setHours(0, 0, 0, 0);
 
-      const nearestDate = new Date(now);
-      nearestDate.setDate(now.getDate() + Math.floor(nearest.diff / 24));
-      nearestDate.setHours(nearest.from, 0, 0, 0);
-
-      console.log('❗ getNearestGameDate(hall):', hall, '→', nearestDate.toISOString().split('T'));
-      return nearestDate.toISOString().split('T');
-
-      return nearestDate.toISOString().split('T')[0];  // YYYY-MM-DD
-    }
+  console.log('❗ getNearestGameDate(hall):', hall, '→', nearestDate.toISOString().split('T')[0]);
+  return nearestDate.toISOString().split('T')[0];
+}
 
 
     function getNearestGameText(hall) {

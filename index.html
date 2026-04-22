@@ -1190,6 +1190,8 @@ async function submitEdit(index) {
       return map[dayName] || 0;
     }
 
+    console.log('scheduleDefs:', scheduleDefs);
+    
     function getNearestGameDate(hall) {
   const now = new Date();
   const nowWeekDay = now.getDay() || 7;

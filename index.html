@@ -1507,32 +1507,20 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
 
       teams.forEach((team, idx) => {
         const number = idx + 1;
-        const basePlayers = team.slice(0, 5);
-        const substitutes = team.slice(5);
 
         inner += `
           <div class="team-card">
             <div class="team-title">
-              Команда ${number} (${basePlayers.length} игроков + ${substitutes.length} замена)
+              Команда ${number} (${team.length} человек)
             </div>
 
             <div class="team-main">
               <ol class="team-main-ol" style="margin: 0; padding-left: 20px; list-style-type: decimal;">
-                ${basePlayers.map(name => `
-                  <li class="team-main-item">${name}</li>
+                ${team.map(name => `
+                  <li class="team-player-item">${name}</li>
                 `).join('')}
               </ol>
             </div>
-
-            ${substitutes.length > 0 ? `
-              <div class="team-sub">
-                <ol class="team-sub-ol" style="margin: 0; padding-left: 20px; list-style-type: decimal;">
-                  ${substitutes.map(name => `
-                    <li class="team-sub-item">${name}</li>
-                  `).join('')}
-                </ol>
-              </div>
-            ` : ''}
           </div>
         `;
       });

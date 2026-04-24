@@ -833,7 +833,7 @@
       //const price = hallPrice[hallKey] || 0;
 
       //const durationSelect = document.getElementById('durationSelect');
-      const durationKey = durationSelect ? durationSelect.value : 'full';   // по умолчанию 2 часа
+      //const durationKey = durationSelect ? durationSelect.value : 'full';   // по умолчанию 2 часа
       const price = hallPriceByDuration[hall]?.[durationKey] || hallPrice[hall] || 0;
       const durationText = durationKey === 'full' ? '2 часа' : durationKey === 'short' ? '1 час 30 мин' : '';
 

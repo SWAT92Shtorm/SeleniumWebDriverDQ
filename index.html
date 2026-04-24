@@ -625,20 +625,12 @@ result.innerHTML = `
     <span>
       Все записавшиеся в <span style="color: #a0e0ff;">${hallName}</span>
     </span>
-    <button
-      onclick="openSettings()"
-      style="
-        margin: 0;
-        padding: 0 8px;
-        height: 32px;
-        border: 1px solid #404040;
-        background: #2d2d2d;
-        color: #e0e0e0;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;">
+    <span
+      style="cursor: pointer; color: red;"
+      title="Сформировать команды"
+      onclick="clearHallPlayers()">
       🎲
-    </button>
+    </span>
   </div>
 
   ${resp ? `
@@ -650,6 +642,7 @@ result.innerHTML = `
     </div>
   ` : ''}
 `;
+
 
 
 

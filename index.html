@@ -342,9 +342,7 @@
   <div id="successAnimation" style="display: none; text-align: center; margin-top: 15px;"></div>
   <div id="result"></div>
 
-  <div id="result"></div>
-
-    <!-- Строка расчёта суммы -->
+  <!-- Строка расчёта суммы -->
   <div id="pricingRow">
     Стоимость к оплате: не выбран зал.
   </div>
@@ -372,6 +370,22 @@
   Очистить список участников
   </button>
   -->  
+
+  <!-- Модальное окно -->
+  <div id="teamsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <strong>Сформированные команды</strong>
+        <span class="modal-close-btn" onclick="closeTeamsModal()">×</span>
+      </div>
+
+      <div id="teamsContent" class="teams-list"></div>
+
+      <div class="modal-footer">
+        <button class="modal-btn-close" onclick="closeTeamsModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
   
   <script>
 
@@ -1456,6 +1470,8 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
       showList();
     });
 
+    // ========== Модальное окно с командами ==========
+
     function openTeamsModal() {
       const hall = document.getElementById('hallSelect').value;
       const players = playersByHall[hall] || [];
@@ -1480,8 +1496,12 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
       }
 
       let inner = `
-        <p style="margin-bottom: 8px; font-weight: 500;">Всего игроков: <strong>${players.length}</strong></p>
-        <p style="margin-bottom: 12px; font-weight: 500;">Сформировано команд: <strong>${numTeams}</strong></p>
+        <p style="margin-bottom: 8px; font-weight: 500;">
+          Всего игроков: <strong>${players.length}</strong>
+        </p>
+        <p style="margin-bottom: 12px; font-weight: 500;">
+          Сформировано команд: <strong>${numTeams}</strong>
+        </p>
       `;
 
       teams.forEach((team, idx) => {
@@ -1496,12 +1516,16 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
             </div>
 
             <div class="team-main">
-              ${basePlayers.length ? basePlayers.map(n => `<span class="team-main-item">${n}</span>`).join('') : '<span style="color: #a0a0a0; font-size: 13px;">нет игроков</span>'}
+              ${basePlayers.map(name => `
+                <span class="team-main-item">${name}</span>
+              `).join('')}
             </div>
 
-            ${substitutes.length ? `
+            ${substitutes.length > 0 ? `
               <div class="team-sub">
-                ${substitutes.map(n => `<span class="team-sub-item">${n}</span>`).join('')}
+                ${substitutes.map(name => `
+                  <span class="team-sub-item">${name}</span>
+                `).join('')}
               </div>
             ` : ''}
           </div>
@@ -1509,8 +1533,10 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
       });
 
       content.innerHTML = inner;
-      modal.classList.add('open');
+
+      modal.style.display = 'flex'; // или: modal.classList.add('open');
     }
+
 
     function closeTeamsModal() {
       const modal = document.getElementById('teamsModal');
@@ -1518,22 +1544,6 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
     }
     
   </script>
-
-  <!-- Модальное окно -->
-  <div id="teamsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <strong>Сформированные команды</strong>
-        <span class="modal-close-btn" onclick="closeTeamsModal()">×</span>
-      </div>
-
-      <div id="teamsContent" class="teams-list"></div>
-
-      <div class="modal-footer">
-        <button class="modal-btn-close" onclick="closeTeamsModal()">Закрыть</button>
-      </div>
-    </div>
-  </div>
   
 
 </body>

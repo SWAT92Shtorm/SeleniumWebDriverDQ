@@ -296,6 +296,17 @@
   display: flex;
 }
 
+#teamsModal .reroll-btn {
+  padding: 6px 12px;
+  background: #006633;
+  color: #ffffff;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 8px;
+}
+
 
 </style>
 
@@ -376,12 +387,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <strong>Сформированные команды</strong>
+        <span style="cursor: pointer; color: red; margin-left: 12px;" onclick="rerollTeams()" title="Перемешать команды заново">🎲</span>
         <span class="modal-close-btn" onclick="closeTeamsModal()">×</span>
       </div>
 
       <div id="teamsContent" class="teams-list"></div>
 
       <div class="modal-footer">
+        <button class="reroll-btn" onclick="rerollTeams()">🎲 Перемешать</button>
         <button class="modal-btn-close" onclick="closeTeamsModal()">Закрыть</button>
       </div>
     </div>
@@ -1536,6 +1549,10 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
       content.innerHTML = inner;
 
       modal.style.display = 'flex';
+    }
+    
+    function rerollTeams() {
+      openTeamsModal(); // Перезапускает модалку с новым перемешиванием
     }
 
     function closeTeamsModal() {

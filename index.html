@@ -611,25 +611,46 @@
       const hallName = parts[0];
       const resp = parts[1] ? parts[1].replace(']', '') : '';
 
-      result.innerHTML = `
-        <div style="
-          font-size: 20px;
-          font-weight: 600;
-          color: #ffffff;
-          margin-bottom: 14px;
-          padding-bottom: 6px;
-          border-bottom: 1px solid #404040;">
-          Все записавшиеся в <span style="color: #a0e0ff;">${hallName}</span>
-        </div>
-        ${resp ? `
-          <div style="
-            font-size: 13px;
-            margin-bottom: 14px;
-            color: #b0ffa0;">
-            Ответственный: ${resp}
-          </div>
-        ` : ''}
-      `;
+result.innerHTML = `
+  <div style="
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #404040;">
+    <span>
+      Все записавшиеся в <span style="color: #a0e0ff;">${hallName}</span>
+    </span>
+    <button
+      onclick="openSettings()"
+      style="
+        margin: 0;
+        padding: 0 8px;
+        height: 32px;
+        border: 1px solid #404040;
+        background: #2d2d2d;
+        color: #e0e0e0;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;">
+      🎲
+    </button>
+  </div>
+
+  ${resp ? `
+    <div style="
+      font-size: 13px;
+      margin-bottom: 14px;
+      color: #b0ffa0;">
+      Ответственный: ${resp}
+    </div>
+  ` : ''}
+`;
+
 
 
       if (players.length === 0) {

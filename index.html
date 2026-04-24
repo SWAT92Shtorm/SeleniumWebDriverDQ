@@ -199,7 +199,6 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   z-index: 1000;
-  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -291,6 +290,10 @@
   border: 1px solid #404040;
   border-radius: 4px;
   cursor: pointer;
+}
+
+#teamsModal.open {
+  display: flex;
 }
 
 
@@ -1495,13 +1498,14 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
     });
 
     content.innerHTML = inner;
-    modal.style.display = 'flex';
+    modal.classList.add('open');
   }
 
 function closeTeamsModal() {
   const modal = document.getElementById('teamsModal');
   modal.style.display = 'none';
-  }
+  modal.classList.remove('open');
+}
 
 
 window.addEventListener("DOMContentLoaded", async function () {

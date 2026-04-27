@@ -902,7 +902,7 @@
 
       showHistoryTable(); 
 
-      document.getElementById('durationSelect').value = players.length >= 15 ? 'full' : 'short';
+      //document.getElementById('durationSelect').value = players.length >= 15 ? 'full' : 'short';
 
     }
 
@@ -1479,6 +1479,11 @@ document.getElementById('hallSelect').addEventListener('change', showNearestGame
       showNearestGame();
       showSchedule();
       showList();
+
+      // Установить длительность ТОЛЬКО при первом открытии
+      const durationSelect = document.getElementById('durationSelect');
+      const currentPlayers = playersByHall[document.getElementById('hallSelect').value]?.length || 0;
+      durationSelect.value = currentPlayers >= 15 ? 'full' : 'short';
     });
 
     // ========== Модальное окно с командами ==========
